@@ -44,6 +44,23 @@ namespace AngularAuthAPI.Controllers
             });
             
         }
+
+        [HttpGet("SearchBooks")]
+        public async Task<ActionResult<IEnumerable<Books>>> SearchBooks(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+                return BadRequest("Search term cannot be empty");
+
+            var books = await _authContext.Books
+                .Where(b =>
+                    b.Title.Contains(searchTerm) ||
+                    b.Author.Contains(searchTerm) ||
+                    b.Category.Contains(searchTerm))
+                .ToListAsync();
+
+            return Ok(books);
+        }
+
         private Task<bool> ChekBookExistAsync(string Title)
             => _authContext.Books.AnyAsync(x => x.Title == Title);
     }

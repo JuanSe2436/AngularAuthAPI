@@ -125,6 +125,65 @@ namespace AngularAuthAPI.Controllers
             return jwtTokenHandler.WriteToken(token);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] User updatedUser)
+        {
+            if (updatedUser == null || id != updatedUser.Id)
+            {
+                return BadRequest();
+            }
+
+            var user = await _authContext.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound(new { Message = "User not found" });
+            }
+
+            // Update user properties
+            user.FirstName = updatedUser.FirstName;
+            user.LastName = updatedUser.LastName;
+            user.Email = updatedUser.Email;
+            user.UserName = updatedUser.UserName;
+            user.Password = PasswordHasher.HashPassword(updatedUser.Password); // Make sure to hash the password
+
+            // Save changes to the database
+            try
+            {
+                await _authContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(id))
+                {
+                    return NotFound(new { Message = "User not found" });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok(new { Message = "User updated successfully" });
+        }
+
+        private bool UserExists(int id)
+        {
+            return _authContext.Users.Any(e => e.Id == id);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<User>> GetUserById(int id)
+        {
+            var user = await _authContext.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
+
 
         [Authorize]
         [HttpGet]
