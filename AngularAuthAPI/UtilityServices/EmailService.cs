@@ -28,12 +28,18 @@ namespace AngularAuthAPI.UtilityServices
             {
                 try
                 {
-                    client.Connect()
+                    client.Connect(_config["EmailSettings:SmtpServer"], 465, true);
+                    client.Authenticate(_config["EmailSettings:From"], _config["EmailSettings:Password"]);
+                    client.Send(emailMessage);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-
                     throw;
+                }
+                finally
+                {
+                    client.Disconnect(true);
+                    client.Dispose();
                 }
             }
         }

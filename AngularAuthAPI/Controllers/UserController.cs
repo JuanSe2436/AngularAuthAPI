@@ -256,5 +256,6 @@ namespace AngularAuthAPI.Controllers
                 RefreshToken = newRefreshToken
             });
         }
+        [HttpPost("send-reset-emai")]
     }
 }
