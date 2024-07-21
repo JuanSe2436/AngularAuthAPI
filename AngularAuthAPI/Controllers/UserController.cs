@@ -256,6 +256,20 @@ namespace AngularAuthAPI.Controllers
                 RefreshToken = newRefreshToken
             });
         }
-        [HttpPost("send-reset-emai")]
+        [HttpPost("send-reset-email/{email}")]
+        public async Task<IActionResult> SendEmail(string email)
+        {
+            var user = _authContext.Users.FirstOrDefaultAsync(a => a.Email == email);
+            if (user is null)
+            {
+                return NotFound(new
+                {
+                    StatusCode = 404,
+                    Message = "email Doesn't exist"
+                });
+            }
+            var tokenBytes = RandomNumberGenerator.GetBytes(64);
+            var emailToken = Convert.ToBase64String(tokenBytes);
+        }
     }
 }
