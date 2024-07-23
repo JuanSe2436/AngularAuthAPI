@@ -15,7 +15,7 @@ namespace AngularAuthAPI.UtilityServices
         public void SendEmail(EmailModel emailModel)
         {
             var emailMessage = new MimeMessage();
-            var from = _config["EmailSetting:From"];
+            var from = _config["EmailSettings:From"];
             emailMessage.From.Add(new MailboxAddress("Let Program", from));
             emailMessage.To.Add(new MailboxAddress(emailModel.To, emailModel.To));
             emailMessage.Subject = emailModel.Subject;
@@ -28,6 +28,9 @@ namespace AngularAuthAPI.UtilityServices
             {
                 try
                 {
+                    var correo = _config["EmailSettings:From"];
+                    var password = _config["EmailSettings:Password"];
+
                     client.Connect(_config["EmailSettings:SmtpServer"], 465, true);
                     client.Authenticate(_config["EmailSettings:From"], _config["EmailSettings:Password"]);
                     client.Send(emailMessage);
